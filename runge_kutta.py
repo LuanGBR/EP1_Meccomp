@@ -1,14 +1,24 @@
 import numpy as np
-def runge_kutta(f,h,x0,y0,n):
-    x=np.zeros(n+1)
-    y=np.zeros((n+1,y0.shape[0]))
-    x[0]=x0
-    y[0,:]=y0
+def runge_kutta(f,Y0,t0,h,tf=None,n=None):
+    """
+    f: função a ser aplicada
+    Y0: vetor inicial
+    t0: tempo inicial
+    h: passo de integração
+    tf: tempo final
+    n: número de passos
+    """
+    if tf is None:
+        tf = t0 + n*h
+    if n is None:
+        n = int((tf-t0)/h)
+    t = np.linspace(t0,tf,n+1)
+    Y = np.zeros((n+1,len(Y0)))
+    Y[0] = Y0
     for i in range(n):
-        k1=f(x[i],y[i,:],0)
-        k2=f(x[i]+h/2,y[i,:]+h*k1/2,h/2)
-        k3=f(x[i]+h/2,y[i,:]+h*k2/2,h/2)
-        k4=f(x[i]+h,y[i,:]+h*k3,h)
-        y[i+1]=y[i,:]+h*(k1+2*k2+2*k3+k4)/6
-        x[i+1]=x[i]+h
-    return x,y
+        k1 = f(t[i],Y[i])
+        k2 = f(t[i]+h/2,Y[i]+h*k1/2)
+        k3 = f(t[i]+h/2,Y[i]+h*k2/2)
+        k4 = f(t[i]+h,Y[i]+h*k3)
+        Y[i+1] = Y[i] + h*(k1+2*k2+2*k3+k4)/6
+    return t,Y
